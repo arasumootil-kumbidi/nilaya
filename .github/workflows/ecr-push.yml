@@ -36,7 +36,7 @@ jobs:
     - name: Build Docker image
       env:
           REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-          REPOSITORY: app-dashboard
+          REPOSITORY: nilaya/app-dashboard
           IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t app-dashboard .
