@@ -1,0 +1,38 @@
+name: Build and Push Docker Image to ECR
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches: 
+     - develop 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app-dashboard
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::739275462327:role/github-actions-role
+        aws-region: eu-west-2
+
+    - name: Log in to Amazon ECR
+      id: ecr-login
+      uses: aws-actions/amazon-ecr-login@v2
+    
+    - name: Build Docker image
+      env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          REPOSITORY: app-dashboard
+          IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t app-dashboard .
+        docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
